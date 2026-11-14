@@ -1,1 +1,1 @@
-amazon-orders[browser]==4.4.0
+amazon-orders[browser]==6.0.0

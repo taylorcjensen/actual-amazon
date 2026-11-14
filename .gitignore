@@ -15,6 +15,8 @@
 # Amazon/order data and generated reports
 data/
 output/
+# Private sync-repair evidence and recovery copies
+/artifacts/2026-11-14-sync-repair/
 
 # Python
 .venv/

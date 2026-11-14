@@ -7,6 +7,7 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
+from amazonorders.conf import AmazonOrdersConfig
 from amazonorders.orders import AmazonOrders
 from amazonorders.session import AmazonSession
 from amazonorders.transactions import AmazonTransactions
@@ -14,7 +15,11 @@ from amazonorders.transactions import AmazonTransactions
 
 def main() -> None:
     args = parse_args()
-    session = AmazonSession(domain=args.domain, debug=args.debug)
+    config = AmazonOrdersConfig(data={
+        "order_class": "amazon_order.RecoverableOrder",
+        "selectors_class": "amazon_order.AmazonSelectors",
+    })
+    session = AmazonSession(domain=args.domain, debug=args.debug, config=config)
     session.login()
 
     orders_client = AmazonOrders(session)
@@ -54,7 +59,7 @@ def parse_args() -> argparse.Namespace:
 
 def fetch_order_history(orders_client: AmazonOrders, args: argparse.Namespace) -> list[Any]:
     if args.time_filter:
-        return orders_client.get_order_history(
+        return orders_client.get_orders(
             full_details=args.full_details,
             time_filter=args.time_filter,
         )
@@ -64,7 +69,7 @@ def fetch_order_history(orders_client: AmazonOrders, args: argparse.Namespace) -
     seen_order_ids = set()
     for year in years:
         print(f"Fetching Amazon order history for {year}")
-        for order in orders_client.get_order_history(year=year, full_details=args.full_details):
+        for order in orders_client.get_orders(year=year, full_details=args.full_details):
             order_id = get_field(order, "order_number")
             if order_id in seen_order_ids:
                 continue
